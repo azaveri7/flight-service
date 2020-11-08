@@ -9,6 +9,8 @@ import org.springframework.stereotype.Service;
 import com.paathshala.flight.flightservice.model.Booking;
 import com.paathshala.flight.flightservice.model.Flight;
 import com.paathshala.flight.flightservice.model.Flights;
+import com.paathshala.flight.flightservice.model.Message;
+import com.paathshala.flight.flightservice.model.MessagePublish;
 import com.paathshala.flight.flightservice.repository.FlightRepository;
 
 @Service
@@ -31,9 +33,12 @@ public class FlightService {
 
 	public Booking bookFlight(Flight flight) {
 		Booking booking = new Booking();
-		String message = flightRepository.bookFlight(flight);
+		Message request = new Message();
+		request.setFlight(flight);
+		request.setEmailId("azaveri7@gmail.com");
+		MessagePublish response = flightRepository.bookFlight(request);		
 		booking.setFlight(flight);
-		booking.setMessage(message);
+		booking.setMessage("SUCCESS");
 		booking.setHostName(
 				env.getProperty("local.server.host") + " is running on " + env.getProperty("local.server.port"));
 		return booking;

@@ -5,12 +5,17 @@ import java.util.List;
 
 import javax.annotation.PostConstruct;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.client.RestTemplate;
 
 import com.paathshala.flight.flightservice.model.Flight;
+import com.paathshala.flight.flightservice.model.Message;
+import com.paathshala.flight.flightservice.model.MessagePublish;
 
 @Repository
 public class FlightRepository {
@@ -19,6 +24,9 @@ public class FlightRepository {
 	private static int idCounter = 0;
 
 	private RestTemplate restTemplate;
+	
+	@Value("${message.service.url}")
+    private String messageServiceUrl;
 
 	@PostConstruct
 	public void init() {
@@ -48,15 +56,11 @@ public class FlightRepository {
 		return flights;
 	}
 
-	public String bookFlight(Flight flight) {
-		/*
-		 * HttpEntity<WeatherResponses> entity = new
-		 * HttpEntity<>(getHttpHeaders()); return restTemplate.exchange(
-		 * "https://samples.openweathermap.org/data/2.5/forecast?q="+city+
-		 * ",us&appid=d2929e9483efc82c82c32ee7%20e02d563e", HttpMethod.GET,
-		 * entity, WeatherResponses.class).getBody();
-		 */
-		return null;
+	public MessagePublish bookFlight(Message request) {
+		HttpEntity<MessagePublish> entity = new HttpEntity<>(getHttpHeaders());
+		ResponseEntity<MessagePublish> response = 
+				restTemplate.postForEntity(messageServiceUrl, request, MessagePublish.class);
+		return response.getBody();
 	}
 
 }
