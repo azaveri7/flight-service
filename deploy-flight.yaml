@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: flight-service-deployment
+spec:
+  selector:
+    matchLabels:
+      app: flight-service
+  replicas: 2 # tells deployment to run 2 pods matching the template
+  template: # create pods using pod definition in this template
+    metadata:
+      labels:
+        app: flight-service
+    spec:
+      containers:
+        - name: flight-service
+          image: azaveri7/flight-service:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8081
+              name: server
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: flight-service-lb
+  labels:
+    app: flight-service
+spec:
+  type: LoadBalancer
+  ports:
+    - port: 8081
+  selector:
+    app: flight-service
