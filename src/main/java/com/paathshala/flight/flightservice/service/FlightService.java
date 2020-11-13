@@ -1,5 +1,10 @@
 package com.paathshala.flight.flightservice.service;
 
+import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
+import com.amazonaws.services.dynamodbv2.model.CreateTableRequest;
+import com.amazonaws.services.dynamodbv2.model.ProvisionedThroughput;
+import com.amazonaws.services.dynamodbv2.util.TableUtils;
 import com.paathshala.flight.flightservice.model.Booking;
 import com.paathshala.flight.flightservice.model.Flight;
 import com.paathshala.flight.flightservice.model.Flights;
@@ -37,9 +42,22 @@ public class FlightService {
 	@Value("${message.service.url}")
 	private String messageServiceUrl;
 
+	@Autowired
+	private AmazonDynamoDB amazonDynamoDB;
+
 	@PostConstruct
 	public void init() {
 		restTemplate = new RestTemplate();
+
+		DynamoDBMapper dynamoDBMapper = new DynamoDBMapper(amazonDynamoDB);
+
+		CreateTableRequest tableRequest = dynamoDBMapper
+				.generateCreateTableRequest(Flight.class);
+
+		tableRequest.setProvisionedThroughput(
+				new ProvisionedThroughput(1L, 1L));
+
+		TableUtils.createTableIfNotExists(amazonDynamoDB, tableRequest);
 	}
 
 
@@ -84,4 +102,7 @@ public class FlightService {
 		return headers;
 	}
 
+	public Flight addFlight(Flight flight) {
+		return repository.save(flight);
+	}
 }

@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: flight-service
-          image: azaveri7/flight-service:latest
+          image: azaveri7/flight-service:external
           imagePullPolicy: Always
           ports:
             - containerPort: 8081
@@ -27,7 +27,7 @@ metadata:
   labels:
     app: flight-service
 spec:
-  type: LoadBalancer
+  type: ClusterIP
   ports:
     - port: 8081
   selector:
