@@ -90,7 +90,8 @@ public class FlightService {
 	private MessagePublish bookFlight(Message request) {
 		HttpEntity<MessagePublish> entity = new HttpEntity<>(getHttpHeaders());
 		ResponseEntity<MessagePublish> response =
-				restTemplate.postForEntity(messageServiceUrl, request, MessagePublish.class);
+				restTemplate.postForEntity(String.format("%s%s", messageServiceUrl, "/publish-message") , request,
+						MessagePublish.class);
 		return response.getBody();
 	}
 

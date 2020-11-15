@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: flight-service
-          image: azaveri7/flight-service:external
+          image: azaveri7/flight-service:external-1
           imagePullPolicy: Always
           ports:
             - containerPort: 8081
