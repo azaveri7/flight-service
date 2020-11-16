@@ -1,5 +1,22 @@
 package com.paathshala.flight.flightservice.service;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
+
+import javax.annotation.PostConstruct;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
 import com.amazonaws.services.dynamodbv2.model.CreateTableRequest;
@@ -11,22 +28,6 @@ import com.paathshala.flight.flightservice.model.Flights;
 import com.paathshala.flight.flightservice.model.Message;
 import com.paathshala.flight.flightservice.model.MessagePublish;
 import com.paathshala.flight.flightservice.repository.FlightRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.env.Environment;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
-
-import javax.annotation.PostConstruct;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 @Service
 public class FlightService {
@@ -51,26 +52,22 @@ public class FlightService {
 
 		DynamoDBMapper dynamoDBMapper = new DynamoDBMapper(amazonDynamoDB);
 
-		CreateTableRequest tableRequest = dynamoDBMapper
-				.generateCreateTableRequest(Flight.class);
+		CreateTableRequest tableRequest = dynamoDBMapper.generateCreateTableRequest(Flight.class);
 
-		tableRequest.setProvisionedThroughput(
-				new ProvisionedThroughput(1L, 1L));
+		tableRequest.setProvisionedThroughput(new ProvisionedThroughput(1L, 1L));
 
 		TableUtils.createTableIfNotExists(amazonDynamoDB, tableRequest);
 	}
 
-
 	public Flights getAllFlights() {
-		Iterable<Flight> flightsSaved = repository
-				.findAll();
-		List<Flight> flightList = StreamSupport.stream(flightsSaved
-				.spliterator(), false)
-				.collect(Collectors.toList());
+		Iterable<Flight> flightsSaved = repository.findAll();
+		List<Flight> flightList = StreamSupport.stream(flightsSaved.spliterator(), false).collect(Collectors.toList());
 		Flights flights = new Flights();
 		flights.setFlights(flightList);
-		flights.setHostName(
-				env.getProperty("local.server.host") + " is running on " + env.getProperty("local.server.port"));
+		/*flights.setHostName(
+				env.getProperty("local.server.host") + " is running on " + env.getProperty("local.server.port"));*/
+		flights.setHostName(env.getProperty("MY_POD_NAME") + " is running on this IP " + env.getProperty("MY_POD_IP")
+		+ " in the namespace " + env.getProperty("MY_POD_NAMESPACE"));
 		return flights;
 	}
 
@@ -82,18 +79,15 @@ public class FlightService {
 		MessagePublish response = bookFlight(request);
 		booking.setFlight(flight);
 		booking.setMessage("SUCCESS");
-		booking.setHostName(
-				env.getProperty("MY_POD_NAME") + " is running on this IP " +
-				        env.getProperty("MY_POD_IP") + " in the namespace " + 
-						env.getProperty("MY_POD_NAMESPACE"));
+		booking.setHostName(env.getProperty("MY_POD_NAME") + " is running on this IP " + env.getProperty("MY_POD_IP")
+				+ " in the namespace " + env.getProperty("MY_POD_NAMESPACE"));
 		return booking;
 	}
 
 	private MessagePublish bookFlight(Message request) {
 		HttpEntity<MessagePublish> entity = new HttpEntity<>(getHttpHeaders());
-		ResponseEntity<MessagePublish> response =
-				restTemplate.postForEntity(String.format("%s%s", messageServiceUrl, "/publish-message") , request,
-						MessagePublish.class);
+		ResponseEntity<MessagePublish> response = restTemplate.postForEntity(
+				String.format("%s%s", messageServiceUrl, "/publish-message"), request, MessagePublish.class);
 		return response.getBody();
 	}
 
