@@ -83,7 +83,9 @@ public class FlightService {
 		booking.setFlight(flight);
 		booking.setMessage("SUCCESS");
 		booking.setHostName(
-				env.getProperty("local.server.host") + " is running on " + env.getProperty("local.server.port"));
+				env.getProperty("MY_POD_NAME") + " is running on this IP " +
+				        env.getProperty("MY_POD_IP") + " in the namespace " + 
+						env.getProperty("MY_POD_NAMESPACE"));
 		return booking;
 	}
 
