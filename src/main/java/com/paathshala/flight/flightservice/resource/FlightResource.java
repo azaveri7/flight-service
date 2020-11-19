@@ -22,7 +22,7 @@ public class FlightResource {
 		return flightService.getAllFlights();
 	}
 	
-	@PostMapping("/booking")
+	@PostMapping("/book")
 	public Booking bookFlight(@RequestBody Flight flight){
 		return flightService.bookFlight(flight);
 	}
