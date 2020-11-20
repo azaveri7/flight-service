@@ -12,4 +12,4 @@ WORKDIR /opt/app
 COPY ${JAR_FILE} flight-service.jar
 
 # Run the jar file 
-ENTRYPOINT ["java","-jar","flight-service.jar" , "-Dspring.profiles.active=aws"]
+ENTRYPOINT ["java", "-Dspring.profiles.active=aws","-jar","flight-service.jar"]
