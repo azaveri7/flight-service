@@ -60,3 +60,22 @@ should give \
         "readiness"
     ]
 }`
+
+#Kubernetes On AWS
+Follow below to configure eksctl \
+https://docs.aws.amazon.com/eks/latest/userguide/getting-started-eksctl.html
+
+Navigate to scripts/aws
+Execute `./deploy-cluster.sh`
+
+Ref: 
+https://docs.aws.amazon.com/eks/latest/userguide/getting-started-eksctl.html
+
+Once this get deployed
+
+./pre-ingress-setup.sh
+
+Ref:
+https://docs.aws.amazon.com/eks/latest/userguide/alb-ingress.html
+
+

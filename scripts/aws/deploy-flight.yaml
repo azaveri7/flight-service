@@ -1,22 +1,22 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: flight-service
   namespace: paathshala
+  name: deployment-flight
 spec:
   selector:
     matchLabels:
-      app: flight-service
-  replicas: 1 # tells deployment to run 2 pods matching the template
-  template: # create pods using pod definition in this template
+      app.kubernetes.io/name: app-flight-service
+  replicas: 2
+  template:
     metadata:
       labels:
-        app: flight-service
+        app.kubernetes.io/name: app-flight-service
     spec:
       containers:
-        - name: flight-service
-          image: 615360450654.dkr.ecr.us-east-2.amazonaws.com/flight-service:latest
+        - image: 615360450654.dkr.ecr.us-east-2.amazonaws.com/flight-service:latest
           imagePullPolicy: Always
+          name: app-flight-service
           ports:
             - containerPort: 8081
               name: server
@@ -37,13 +37,11 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: flight-service-svc-aws
   namespace: paathshala
-  labels:
-    app: flight-service
+  name: flight-service-svc
 spec:
-  type: ClusterIP
   ports:
     - port: 8081
+  type: ClusterIP
   selector:
-    app: flight-service
+    app.kubernetes.io/name: app-flight-service
